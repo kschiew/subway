@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"subway/translator"
 
 	"encoding/json"
@@ -24,6 +25,14 @@ func TranslateSentenceHandler(w http.ResponseWriter, r *http.Request) {
 	log.Print("Translate Sentence Handler")
 	// TODO: Set CORS in response header
 	// w.Header().Set("Access-Control-Allow-Origin", "chrome-extension://<YOUR_ID>")
+
+	// Auth: Check for shared API key
+	authHeader := r.Header.Get("Authorization")
+	bearerToken := strings.Split(authHeader, "Bearer ")[1]
+	if bearerToken != os.Getenv("API_TOKEN") {
+		http.Error(w, "Invalid bearer token", http.StatusUnauthorized)
+		return
+	}
 
 	var req TranslateRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -49,7 +58,7 @@ func TranslateSentenceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("translated text: ", translated)
+	log.Println("Translated text: ", translated)
 	json.NewEncoder(w).Encode(TranslateResponse{Translation: translated})
 }
 

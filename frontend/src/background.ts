@@ -49,6 +49,7 @@ async function translateText(
   text: string,
   targetLang: string,
 ): Promise<string> {
+  console.log('[Service Worker]BACKEND TOKEN: ', BACKEND_TOKEN)
   const response = await fetch(`${BACKEND_URL}/translate`, {
     method: 'POST',
     headers: {
